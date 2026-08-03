@@ -3,128 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WCF Job Search — オーストラリア求人情報</title>
-<meta name="description" content="Women Can Fly が集めた、オーストラリア・ワーホリ/留学生向けの求人情報。週ごとに更新。">
+<title>Job Search — オーストラリア求人情報</title>
+<meta name="description" content="オーストラリア・ワーホリ／留学生向けの求人情報。週ごとに更新。">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f0f2f5;
+    --bg: #f6f7f9;
     --card: #ffffff;
     --text: #1c1e21;
-    --sub: #65676b;
-    --brand: #1877f2;
-    --border: #e4e6eb;
+    --sub: #6b7076;
+    --faint: #9a9ea3;
+    --brand: #2f6feb;
+    --brand-dark: #1f52b8;
+    --border: #e8e9ec;
+    --radius: 14px;
   }
   body {
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
+    -webkit-font-smoothing: antialiased;
   }
+
   header {
-    background: linear-gradient(135deg, #1877f2, #0d5bc4);
-    color: white;
-    padding: 36px 20px 28px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 20px 22px;
     text-align: center;
   }
-  header h1 { font-size: 24px; margin-bottom: 6px; }
-  header p { font-size: 13px; opacity: 0.9; }
-  .search-bar {
-    max-width: 480px;
-    margin: 20px auto 0;
+  header .eyebrow {
+    font-size: 11.5px; letter-spacing: 0.08em; color: var(--faint);
+    text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
   }
-  .search-bar input {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 24px;
-    border: none;
-    font-size: 14px;
-    outline: none;
+  header h1 {
+    font-size: 25px; font-weight: 800; letter-spacing: -0.01em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  main { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+  header p { font-size: 13.5px; color: var(--sub); margin-top: 6px; }
 
-  .week-tabs {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    margin-bottom: 20px;
+  .search-bar { max-width: 460px; margin: 18px auto 0; position: relative; }
+  .search-bar input {
+    width: 100%; padding: 12px 16px 12px 40px; border-radius: 24px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: 14px; outline: none; transition: border-color 0.15s, background 0.15s;
   }
+  .search-bar input:focus { border-color: var(--brand); background: var(--card); }
+  .search-bar::before {
+    content: "🔍"; position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; opacity: 0.5;
+  }
+
+  .stats-bar {
+    display: flex; justify-content: center; gap: 28px; flex-wrap: wrap;
+    max-width: 900px; margin: 18px auto 0; padding: 0 16px;
+  }
+  .stat { text-align: center; }
+  .stat .num { font-size: 19px; font-weight: 800; color: var(--brand); }
+  .stat .lbl { font-size: 11px; color: var(--faint); margin-top: 1px; }
+
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .week-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
   .week-tab {
     padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--card); font-size: 13px; font-weight: 600; cursor: pointer;
+    background: var(--card); font-size: 13px; font-weight: 700; cursor: pointer;
     color: var(--sub); transition: all 0.15s;
   }
-  .week-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+  .week-tab.active { background: var(--text); color: white; border-color: var(--text); }
   .week-tab:hover:not(.active) { border-color: var(--brand); color: var(--brand); }
 
   .week-panel { display: none; }
-  .week-panel.active { display: block; }
+  .week-panel.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-  .city-tabs {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    justify-content: center; margin-bottom: 20px;
-  }
+  .city-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 22px; }
   .city-tab {
-    padding: 7px 16px; border: none; border-radius: 20px;
-    font-size: 13px; cursor: pointer; font-weight: 600;
-    opacity: 0.5; transition: opacity 0.15s;
+    padding: 7px 15px; border: 1px solid transparent; border-radius: 20px;
+    font-size: 13px; cursor: pointer; font-weight: 700;
+    opacity: 0.45; transition: opacity 0.15s, transform 0.1s;
   }
   .city-tab.active { opacity: 1; }
   .city-tab:hover { opacity: 0.85; }
-  .c-sydney    { background: #d0e8ff; color: #1877f2; }
-  .c-melbourne { background: #ffe4c0; color: #e67e00; }
-  .c-brisbane  { background: #fff3b0; color: #b08000; }
-  .c-perth     { background: #d0f5d0; color: #2e7d32; }
-  .c-other     { background: #e8e8e8; color: #444; }
+  .c-sydney    { background: #e2eeff; color: #2f6feb; }
+  .c-melbourne { background: #ffedd9; color: #d9760a; }
+  .c-brisbane  { background: #fff6cf; color: #a6790a; }
+  .c-perth     { background: #ddf4e0; color: #2e8a4a; }
+  .c-other     { background: #ececec; color: #555; }
 
   .city-panel { display: none; }
   .city-panel.active { display: block; }
 
+  .job-grid {
+    display: grid; grid-template-columns: 1fr; gap: 14px;
+  }
+  @media (min-width: 680px) {
+    .job-grid { grid-template-columns: 1fr 1fr; }
+  }
+
   .job-card {
-    background: var(--card); border-radius: 12px; padding: 20px;
-    margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    background: var(--card); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 18px; box-shadow: 0 1px 2px rgba(20,20,30,0.03);
+    transition: box-shadow 0.15s, transform 0.15s;
+    display: flex; flex-direction: column;
   }
-  .job-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-  .job-company { font-size: 13.5px; color: var(--sub); margin-bottom: 12px; }
-  .job-meta { font-size: 13px; color: var(--sub); margin-bottom: 4px; line-height: 1.6; }
-  .job-meta b { color: var(--text); font-weight: 600; }
-  .job-req { margin: 8px 0; padding-left: 18px; }
-  .job-req li { font-size: 13px; color: var(--sub); margin-bottom: 2px; }
-  .job-desc { font-size: 13.5px; margin: 10px 0; line-height: 1.7; }
+  .job-card:hover { box-shadow: 0 6px 18px rgba(20,20,30,0.08); transform: translateY(-1px); }
+
+  .job-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+  .job-icon {
+    flex: none; width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+  }
+  .job-titlewrap { flex: 1; min-width: 0; }
+  .job-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; }
+  .job-company { font-size: 12.5px; color: var(--sub); margin-top: 2px; }
+
   .job-wage {
-    display: inline-block; background: #e6f4ea; color: #2e7d32;
-    font-size: 14px; font-weight: 700; padding: 5px 12px; border-radius: 8px;
-    margin: 6px 0 12px;
+    display: inline-block; background: #eaf7ee; color: #1e7a3c;
+    font-size: 13.5px; font-weight: 800; padding: 5px 11px; border-radius: 8px;
+    margin-bottom: 10px; align-self: flex-start;
   }
+
+  .job-meta { font-size: 12.5px; color: var(--sub); margin-bottom: 3px; line-height: 1.6; }
+  .job-meta b { color: var(--text); font-weight: 700; }
+
+  .job-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .job-tag {
+    font-size: 11.5px; color: var(--sub); background: var(--bg);
+    border: 1px solid var(--border); padding: 3px 9px; border-radius: 6px;
+  }
+
+  .job-desc { font-size: 13px; margin: 8px 0 12px; line-height: 1.7; color: var(--text); }
+
+  .job-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; }
   .job-apply {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--brand); color: white; text-decoration: none;
-    font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; padding: 9px 16px; border-radius: 9px;
     transition: background 0.15s;
   }
-  .job-apply:hover { background: #145dbf; }
-  .job-source { font-size: 11px; color: #999; margin-left: 10px; }
+  .job-apply:hover { background: var(--brand-dark); }
+  .job-source { font-size: 11px; color: var(--faint); }
 
-  .no-result { text-align: center; color: var(--sub); padding: 40px 0; font-size: 14px; }
+  .no-result { text-align: center; color: var(--sub); padding: 50px 0; font-size: 14px; }
 
   footer {
-    text-align: center; color: var(--sub); font-size: 12px;
-    padding: 30px 20px 50px; line-height: 1.8;
+    text-align: center; color: var(--faint); font-size: 12px;
+    padding: 36px 20px 50px; line-height: 1.9; border-top: 1px solid var(--border);
+    margin-top: 20px;
   }
+  footer .credit { margin-top: 10px; font-size: 11.5px; color: var(--faint); }
 
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#18191a; --card:#242526; --text:#e4e6eb; --sub:#b0b3b8; --border:#3a3b3c; }
-    .search-bar input { background: #3a3b3c; color: #e4e6eb; }
-    .week-tab { background: var(--card); }
-    .job-wage { background: #1c3a2a; color: #6fd393; }
+    :root {
+      --bg:#111214; --card:#1b1c1f; --text:#e9eaec; --sub:#a3a7ac; --faint:#75797e; --border:#2c2d31;
+    }
+    .search-bar input { color: var(--text); }
+    .job-wage { background: #16301f; color: #6fd393; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🔎 WCF Job Search</h1>
-  <p>Women Can Fly が集めた、オーストラリア・ワーホリ／留学生向けの求人情報</p>
+  <div class="eyebrow">Australia · Working Holiday / Student</div>
+  <h1>🔎 Job Search</h1>
+  <p>オーストラリアのワーホリ・留学生向け求人をまとめて掲載</p>
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="会社名・職種・地域で検索…">
   </div>
+  <div class="stats-bar" id="statsBar"></div>
 </header>
 
 <main>
@@ -136,20 +184,55 @@
 <footer>
   少しでも皆さんのお仕事が見つかりやすくなるよう、一般の掲示板などで見つけた求人を掲載しています。<br>
   こちらで記載する情報は自己責任でご応募ください。お仕事内容・面接の合否には責任は持てません。<br>
-  URL・賃金・勤務地は掲載時点で実在確認済みです。<br><br>
-  © Women Can Fly
+  URL・賃金・勤務地は掲載時点で実在確認済みです。
+  <div class="credit">運営: Women Can Fly</div>
 </footer>
 
 <script src="data.js"></script>
 <script>
 const CITY_KEYS = ["sydney", "melbourne", "brisbane", "perth", "other"];
 
+// カテゴリ判定（タイトル・会社名・仕事内容のキーワードから自動分類）
+const CATEGORY_RULES = [
+  { key: 'restaurant', label: '飲食', icon: '🍽️', bg: 'linear-gradient(135deg,#ffe3d1,#ffd0a8)', kw: ['キッチン','バリスタ','ウェイター','ホール','カフェ','寿司','ラーメン','居酒屋','ビュッフェ','シェフ','料理','ジェラート','ドーナツ','デリ','フード','バーテンダー','サーバー','ジュース'] },
+  { key: 'warehouse', label: '倉庫・物流', icon: '📦', bg: 'linear-gradient(135deg,#e6dcc8,#d8c39e)', kw: ['倉庫','ピッキング','パッキング','ファクトリー','工場','配送','ストアパーソン','ウェアハウス','ドライバー'] },
+  { key: 'hotel', label: 'ホテル', icon: '🏨', bg: 'linear-gradient(135deg,#cfeeee,#a9dcdc)', kw: ['ホテル','ハウスキーピング','客室清掃','レセプショニスト','ルームアテンダント'] },
+  { key: 'farm', label: '農業', icon: '🌾', bg: 'linear-gradient(135deg,#dcefc8,#bfe29c)', kw: ['ファーム','苺','ピッキング（苺','農場'] },
+  { key: 'beauty', label: '美容', icon: '💇', bg: 'linear-gradient(135deg,#fbdce7,#f6b9d1)', kw: ['美容師','スタイリスト','ヘア'] },
+  { key: 'event', label: 'イベント', icon: '🎪', bg: 'linear-gradient(135deg,#e6d9fb,#cfb3f5)', kw: ['イベント'] },
+  { key: 'retail', label: '販売・小売', icon: '🛍️', bg: 'linear-gradient(135deg,#fde3ee,#fabdd8)', kw: ['販売','リテール','マーチャンダイザー','セールスアシスタント','ショップ'] },
+  { key: 'office', label: '事務・営業', icon: '💼', bg: 'linear-gradient(135deg,#dde3f7,#bfc9ef)', kw: ['インサイドセールス','事務','クラーク','ルートセールス','旅行代理店'] },
+];
+
+function categorize(job) {
+  const hay = (job.title + ' ' + job.company + ' ' + job.description).toLowerCase();
+  for (const rule of CATEGORY_RULES) {
+    if (rule.kw.some(k => hay.includes(k.toLowerCase()))) return rule;
+  }
+  return { key: 'general', label: '求人', icon: '⭐', bg: 'linear-gradient(135deg,#ececec,#d9d9d9)' };
+}
+
+function buildStats() {
+  let total = 0;
+  const citiesSeen = new Set();
+  JOB_WEEKS.forEach(w => CITY_KEYS.forEach(ck => {
+    const c = w.cities[ck];
+    if (c) { total += c.jobs.length; citiesSeen.add(ck); }
+  }));
+  const bar = document.getElementById('statsBar');
+  bar.innerHTML = `
+    <div class="stat"><div class="num">${total}</div><div class="lbl">掲載求人数</div></div>
+    <div class="stat"><div class="num">${JOB_WEEKS.length}</div><div class="lbl">週分のアーカイブ</div></div>
+    <div class="stat"><div class="num">${citiesSeen.size}</div><div class="lbl">エリア</div></div>
+  `;
+}
+
 function buildSite() {
+  buildStats();
   const weekTabs = document.getElementById('weekTabs');
   const weekPanels = document.getElementById('weekPanels');
 
   JOB_WEEKS.forEach((week, wi) => {
-    // week tab
     const tab = document.createElement('button');
     tab.className = 'week-tab' + (wi === 0 ? ' active' : '');
     tab.textContent = week.label;
@@ -157,14 +240,12 @@ function buildSite() {
     tab.id = 'week-tab-' + wi;
     weekTabs.appendChild(tab);
 
-    // week panel
     const panel = document.createElement('div');
     panel.className = 'week-panel' + (wi === 0 ? ' active' : '');
     panel.id = 'week-panel-' + wi;
 
     const cityTabs = document.createElement('div');
     cityTabs.className = 'city-tabs';
-
     const cityPanelsWrap = document.createElement('div');
 
     CITY_KEYS.forEach((ck, ci) => {
@@ -182,9 +263,10 @@ function buildSite() {
       cpanel.className = 'city-panel' + (ci === 0 ? ' active' : '');
       cpanel.id = 'city-panel-' + wi + '-' + ck;
 
-      city.jobs.forEach(job => {
-        cpanel.appendChild(renderJobCard(job, week.label, city.name));
-      });
+      const grid = document.createElement('div');
+      grid.className = 'job-grid';
+      city.jobs.forEach(job => grid.appendChild(renderJobCard(job, city.name)));
+      cpanel.appendChild(grid);
 
       cityPanelsWrap.appendChild(cpanel);
     });
@@ -195,23 +277,31 @@ function buildSite() {
   });
 }
 
-function renderJobCard(job, weekLabel, cityName) {
+function renderJobCard(job, cityName) {
+  const cat = categorize(job);
   const card = document.createElement('div');
   card.className = 'job-card';
   card.dataset.search = [job.title, job.company, job.location, cityName].join(' ').toLowerCase();
 
-  const reqHtml = job.requirements.map(r => `<li>${escapeHtml(r)}</li>`).join('');
+  const tagHtml = job.requirements.map(r => `<span class="job-tag">${escapeHtml(r)}</span>`).join('');
 
   card.innerHTML = `
-    <div class="job-title">${escapeHtml(job.title)}</div>
-    <div class="job-company">${escapeHtml(job.company)}</div>
+    <div class="job-head">
+      <div class="job-icon" style="background:${cat.bg}">${cat.icon}</div>
+      <div class="job-titlewrap">
+        <div class="job-title">${escapeHtml(job.title)}</div>
+        <div class="job-company">${escapeHtml(job.company)}</div>
+      </div>
+    </div>
+    <div class="job-wage">💰 ${escapeHtml(job.wage)}</div>
     <div class="job-meta">📍 <b>勤務地:</b> ${escapeHtml(job.location)}</div>
     <div class="job-meta">🗓 <b>勤務日数:</b> ${escapeHtml(job.schedule)}</div>
-    <ul class="job-req">${reqHtml}</ul>
+    <div class="job-tags">${tagHtml}</div>
     <div class="job-desc">${escapeHtml(job.description)}</div>
-    <div class="job-wage">💰 ${escapeHtml(job.wage)}</div><br>
-    <a class="job-apply" href="${job.url}" target="_blank" rel="noopener">求人ページを見る →</a>
-    <span class="job-source">via ${escapeHtml(job.source)}</span>
+    <div class="job-foot">
+      <a class="job-apply" href="${job.url}" target="_blank" rel="noopener">求人ページを見る →</a>
+      <span class="job-source">via ${escapeHtml(job.source)}</span>
+    </div>
   `;
   return card;
 }
