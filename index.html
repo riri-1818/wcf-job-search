@@ -63,6 +63,29 @@
 
   main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
 
+  .main-tabs {
+    display: flex; gap: 10px; justify-content: center; margin-bottom: 26px;
+  }
+  .main-tab {
+    padding: 11px 22px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); font-size: 14.5px; font-weight: 800; cursor: pointer;
+    color: var(--sub); transition: all 0.15s;
+  }
+  .main-tab.active { background: var(--text); color: white; border-color: var(--text); }
+  .main-tab:hover:not(.active) { border-color: var(--brand); color: var(--brand); }
+
+  .main-section { display: none; }
+  .main-section.active { display: block; animation: fadeIn 0.25s ease; }
+
+  .featured-banner {
+    background: linear-gradient(135deg,#fff3e0,#ffe0c2);
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px;
+    font-size: 13px; color: #8a5a1e; line-height: 1.6;
+  }
+  @media (prefers-color-scheme: dark) {
+    .featured-banner { background: linear-gradient(135deg,#3a2c18,#2e2415); color: #e8c690; }
+  }
+
   .week-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
   .week-tab {
     padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
@@ -115,8 +138,8 @@
     font-size: 20px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
   }
   .job-titlewrap { flex: 1; min-width: 0; }
-  .job-title { font-size: 15.5px; font-weight: 700; line-height: 1.35; }
-  .job-company { font-size: 12.5px; color: var(--sub); margin-top: 2px; }
+  .job-company { font-size: 16.5px; font-weight: 800; line-height: 1.3; letter-spacing: -0.01em; }
+  .job-title { font-size: 12.5px; color: var(--sub); font-weight: 600; margin-top: 3px; }
 
   .job-wage {
     display: inline-block; background: #eaf7ee; color: #1e7a3c;
@@ -176,8 +199,22 @@
 </header>
 
 <main>
-  <div class="week-tabs" id="weekTabs"></div>
-  <div id="weekPanels"></div>
+  <div class="main-tabs">
+    <button class="main-tab active" id="tab-featured" onclick="showMain('featured')">☕ カフェ・レストラン特集</button>
+    <button class="main-tab" id="tab-archive" onclick="showMain('archive')">📅 週間アーカイブ</button>
+  </div>
+
+  <div class="main-section active" id="section-featured">
+    <div class="featured-banner">みんながよく探している、カフェ・レストランの仕事を集めました。掲載店舗名で検索もできます。</div>
+    <div class="city-tabs" id="featuredCityTabs"></div>
+    <div id="featuredCityPanels"></div>
+  </div>
+
+  <div class="main-section" id="section-archive">
+    <div class="week-tabs" id="weekTabs"></div>
+    <div id="weekPanels"></div>
+  </div>
+
   <div class="no-result" id="noResult" style="display:none;">該当する求人が見つかりませんでした。</div>
 </main>
 
@@ -219,6 +256,10 @@ function buildStats() {
     const c = w.cities[ck];
     if (c) { total += c.jobs.length; citiesSeen.add(ck); }
   }));
+  CITY_KEYS.forEach(ck => {
+    const c = FEATURED_CAFE_RESTAURANT.cities[ck];
+    if (c) { total += c.jobs.length; citiesSeen.add(ck); }
+  });
   const bar = document.getElementById('statsBar');
   bar.innerHTML = `
     <div class="stat"><div class="num">${total}</div><div class="lbl">掲載求人数</div></div>
@@ -227,8 +268,53 @@ function buildStats() {
   `;
 }
 
+function buildFeatured() {
+  const cityTabs = document.getElementById('featuredCityTabs');
+  const cityPanels = document.getElementById('featuredCityPanels');
+
+  CITY_KEYS.forEach((ck, ci) => {
+    const city = FEATURED_CAFE_RESTAURANT.cities[ck];
+    if (!city) return;
+
+    const ctab = document.createElement('button');
+    ctab.className = 'city-tab c-' + ck + (ci === 0 ? ' active' : '');
+    ctab.textContent = city.emoji + ' ' + city.name;
+    ctab.onclick = () => showFeaturedCity(ck);
+    ctab.id = 'featured-city-tab-' + ck;
+    cityTabs.appendChild(ctab);
+
+    const cpanel = document.createElement('div');
+    cpanel.className = 'city-panel' + (ci === 0 ? ' active' : '');
+    cpanel.id = 'featured-city-panel-' + ck;
+
+    const grid = document.createElement('div');
+    grid.className = 'job-grid';
+    city.jobs.forEach(job => grid.appendChild(renderJobCard(job, city.name)));
+    cpanel.appendChild(grid);
+
+    cityPanels.appendChild(cpanel);
+  });
+}
+
+function showFeaturedCity(ck) {
+  document.querySelectorAll('#featuredCityPanels .city-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#featuredCityTabs .city-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('featured-city-panel-' + ck).classList.add('active');
+  document.getElementById('featured-city-tab-' + ck).classList.add('active');
+  applySearch();
+}
+
+function showMain(section) {
+  document.getElementById('section-featured').classList.toggle('active', section === 'featured');
+  document.getElementById('section-archive').classList.toggle('active', section === 'archive');
+  document.getElementById('tab-featured').classList.toggle('active', section === 'featured');
+  document.getElementById('tab-archive').classList.toggle('active', section === 'archive');
+  applySearch();
+}
+
 function buildSite() {
   buildStats();
+  buildFeatured();
   const weekTabs = document.getElementById('weekTabs');
   const weekPanels = document.getElementById('weekPanels');
 
@@ -289,8 +375,8 @@ function renderJobCard(job, cityName) {
     <div class="job-head">
       <div class="job-icon" style="background:${cat.bg}">${cat.icon}</div>
       <div class="job-titlewrap">
-        <div class="job-title">${escapeHtml(job.title)}</div>
         <div class="job-company">${escapeHtml(job.company)}</div>
+        <div class="job-title">${escapeHtml(job.title)}</div>
       </div>
     </div>
     <div class="job-wage">💰 ${escapeHtml(job.wage)}</div>
@@ -330,16 +416,19 @@ function showCity(wi, ck) {
 
 function applySearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  let anyVisibleInActiveWeek = false;
-  const activeWeekPanel = document.querySelector('.week-panel.active');
+  let anyVisibleInScope = false;
+  const isFeatured = document.getElementById('section-featured').classList.contains('active');
+  const scopeEl = isFeatured
+    ? document.querySelector('#featuredCityPanels .city-panel.active')
+    : document.querySelector('.week-panel.active .city-panel.active');
 
   document.querySelectorAll('.job-card').forEach(card => {
     const match = !q || card.dataset.search.includes(q);
     card.style.display = match ? '' : 'none';
-    if (match && activeWeekPanel && activeWeekPanel.contains(card)) anyVisibleInActiveWeek = true;
+    if (match && scopeEl && scopeEl.contains(card)) anyVisibleInScope = true;
   });
 
-  document.getElementById('noResult').style.display = (q && !anyVisibleInActiveWeek) ? 'block' : 'none';
+  document.getElementById('noResult').style.display = (q && !anyVisibleInScope) ? 'block' : 'none';
 }
 
 document.getElementById('searchInput').addEventListener('input', applySearch);
